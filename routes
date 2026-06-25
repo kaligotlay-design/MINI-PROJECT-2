@@ -1,0 +1,109 @@
+const express = require("express");
+const router = express.Router();
+
+const OnlineExam = require("../models/online");
+
+
+// CREATE
+router.post("/", async (req, res) => {
+  try {
+    const exam = new OnlineExam(req.body);
+    const savedExam = await exam.save();
+
+    res.status(201).json(savedExam);
+  } catch (err) {
+    res.status(400).json({
+      message: err.message,
+    });
+  }
+});
+
+
+// READ ALL
+router.get("/", async (req, res) => {
+  try {
+    const exams = await OnlineExam.find();
+
+    res.json(exams);
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
+
+
+// READ ONE
+router.get("/:id", async (req, res) => {
+  try {
+    const exam = await OnlineExam.findById(req.params.id);
+
+    if (!exam) {
+      return res.status(404).json({
+        message: "Record not found",
+      });
+    }
+
+    res.json(exam);
+
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
+
+
+// UPDATE
+router.put("/:id", async (req, res) => {
+  try {
+
+    const updatedExam = await OnlineExam.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!updatedExam) {
+      return res.status(404).json({
+        message: "Record not found",
+      });
+    }
+
+    res.json(updatedExam);
+
+  } catch (err) {
+    res.status(400).json({
+      message: err.message,
+    });
+  }
+});
+
+
+// DELETE
+router.delete("/:id", async (req, res) => {
+  try {
+
+    const deletedExam = await OnlineExam.findByIdAndDelete(req.params.id);
+
+    if (!deletedExam) {
+      return res.status(404).json({
+        message: "Record not found",
+      });
+    }
+
+    res.json({
+      message: "Record deleted successfully",
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
+
+module.exports = router;
